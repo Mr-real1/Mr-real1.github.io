@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Portfolio</title>
+    <!-- FontAwesome for Social Media Icons -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .portfolio-card {
+            background: white;
+            max-width: 450px;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            padding: 40px 30px;
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #0070f3;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #111;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .bio {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .social-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #f0f2f5;
+            color: #333;
+            text-decoration: none;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* Social Brand Colors on Hover */
+        .social-icon.facebook:hover { background: #1877f2; color: white; }
+        .social-icon.instagram:hover { background: #e1306c; color: white; }
+        .social-icon.linkedin:hover { background: #0077b5; color: white; }
+        .social-icon.github:hover { background: #333; color: white; }
+
+        .cta-button {
+            display: inline-block;
+            background: #0070f3;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .cta-button:hover {
+            background: #0051b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portfolio-card">
+        <!-- Replace with your own image URL later -->
+        <img src="https://placeholder.com" alt="Profile Picture" class="profile-img">
+        
+        <h1>Your Name</h1>
+        <p class="subtitle">Student & Developer</p>
+        
+        <p class="bio">
+            Welcome to my portfolio! I am a student passionate about building clean web experiences. 
+            Check out my social profiles below or get in touch to collaborate on projects.
+        </p>
+
+        <!-- Social Media Section -->
+        <div class="social-links">
+            <!-- Replace the # with your actual profile links -->
+            <a href="#" class="social-icon facebook" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-icon instagram" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-icon linkedin" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon github" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+
+        <a href="mailto:your-email@example.com" class="cta-button">Email Me</a>
+    </div>
+
+</body>
+</html>
