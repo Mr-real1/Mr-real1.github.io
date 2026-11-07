@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -6,6 +6,7 @@
   <title>Ramadan Osmail | Portfolio</title>
   <meta name="description" content="Portfolio of Ramadan Osmail - AI enthusiast, creative technologist, and robotics builder." />
   <meta name="keywords" content="Ramadan Osmail, portfolio, AI, robotics, automation, creative technology" />
+  <link rel="icon" type="image/png" href="logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
@@ -63,10 +64,20 @@
     }
 
     .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       font-size: 0.86rem;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      border-radius: 50%;
     }
 
     .brand span {
@@ -213,13 +224,10 @@
     .avatar {
       width: 84px;
       height: 84px;
-      display: grid;
-      place-items: center;
       border-radius: 22px;
-      background: linear-gradient(135deg, #dbeafe, #e9d5ff);
-      color: var(--text);
-      font-size: 2rem;
-      font-weight: 800;
+      object-fit: cover;
+      background: white;
+      padding: 5px;
       box-shadow: 0 10px 24px rgba(0,0,0,0.18);
     }
 
@@ -623,7 +631,10 @@
 <body>
   <header class="topbar">
     <div class="container topbar-inner">
-      <a href="#home" class="brand">Ramadan <span>Osmail</span></a>
+      <a href="#home" class="brand">
+        <img class="brand-logo" src="logo.png" alt="Ramadan Osmail logo" />
+        <span>Ramadan Osmail</span>
+      </a>
       <nav class="nav" aria-label="Main navigation">
         <a href="#about">About</a>
         <a href="#skills">Skills</a>
@@ -652,7 +663,7 @@
 
         <aside class="hero-card" aria-label="Profile summary">
           <div class="profile-box">
-            <div class="avatar">RO</div>
+            <img class="avatar" src="logo.png" alt="Ramadan Osmail logo" />
             <div>
               <small>Profile</small>
               <strong>Ramadan Osmail</strong>
