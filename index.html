@@ -3,8 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link Matrix | Futuristic Profile</title>
     
+    <!-- Standard Website SEO & Meta Tags -->
+    <title>Ramadan Osmail | Nexus Link</title>
+    <meta name="description" content="Personal portal of Ramadan Osmail. Exploring AI, robotics, and creative tech.">
+    <meta name="keywords" content="Ramadan Osmail, AI, Tech, Som.Creative, Portfolio, Link Tree">
+    
+    <!-- Open Graph for Social Media Previews -->
+    <meta property="og:title" content="Ramadan Osmail | Nexus Link">
+    <meta property="og:description" content="Creative tech enthusiast. AI automations, DIY robotics, and content creation.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mrreal.me">
+    
+    <!-- Favicon (Fallback emoji) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -18,30 +31,33 @@
         :root {
             --neon-cyan: #00f3ff;
             --neon-purple: #b537f2;
-            --bg-dark: #030308;
+            --neon-red: #ff003c;
+            --bg-dark: #05050a;
         }
 
         body {
             font-family: 'Rajdhani', sans-serif;
             background-color: var(--bg-dark);
             color: white;
-            overflow: hidden; /* Prevent scrolling, canvas handles background */
+            overflow-x: hidden;
             margin: 0;
             padding: 0;
+            min-height: 100vh;
         }
 
         .font-mono {
             font-family: 'Share Tech Mono', monospace;
         }
 
-        /* Canvas Background */
+        /* Canvas Background - Fixed to background */
         #particle-canvas {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
+            pointer-events: none; /* Allows clicking through canvas */
         }
 
         /* Main Content Wrapper */
@@ -52,32 +68,33 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
+            padding: 2rem 1rem;
         }
 
-        /* Glassmorphism Cyber Card */
+        /* Refined Glassmorphism Cyber Card - Less chunky, more elegant */
         .cyber-card {
-            background: rgba(10, 10, 20, 0.6);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 243, 255, 0.15);
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.1), 
-                        inset 0 0 20px rgba(181, 55, 242, 0.05);
+            background: rgba(10, 10, 18, 0.45);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 243, 255, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 
+                        inset 0 0 15px rgba(0, 243, 255, 0.03);
             position: relative;
             overflow: hidden;
+            border-radius: 12px;
         }
 
-        /* Scanning Line Effect */
+        /* Scanning Line Effect - Subtler */
         .cyber-card::before {
             content: '';
             position: absolute;
             top: -100%;
             left: 0;
             width: 100%;
-            height: 5px;
+            height: 2px;
             background: linear-gradient(to right, transparent, var(--neon-cyan), transparent);
-            opacity: 0.5;
-            animation: scanline 4s linear infinite;
+            opacity: 0.3;
+            animation: scanline 6s linear infinite;
         }
 
         @keyframes scanline {
@@ -85,17 +102,17 @@
             100% { top: 110%; }
         }
 
-        /* Avatar Styling */
+        /* Avatar Styling - Smoother glow */
         .avatar-container {
             position: relative;
-            width: 120px;
-            height: 120px;
+            width: 110px;
+            height: 110px;
             margin: 0 auto;
             border-radius: 50%;
-            padding: 4px;
-            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple));
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4), 0 0 40px rgba(181, 55, 242, 0.2);
-            animation: pulse-glow 3s ease-in-out infinite alternate;
+            padding: 3px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+            animation: pulse-glow 4s ease-in-out infinite alternate;
         }
 
         .avatar-inner {
@@ -107,83 +124,77 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            border: 2px solid var(--bg-dark);
         }
 
         @keyframes pulse-glow {
-            0% { box-shadow: 0 0 15px rgba(0, 243, 255, 0.4), 0 0 30px rgba(181, 55, 242, 0.2); }
-            100% { box-shadow: 0 0 25px rgba(0, 243, 255, 0.6), 0 0 50px rgba(181, 55, 242, 0.4); }
+            0% { box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
+            100% { box-shadow: 0 0 25px rgba(0, 243, 255, 0.4), 0 0 15px rgba(181, 55, 242, 0.2); }
         }
 
         /* Typography Glowing Effects */
         .text-glow-cyan {
-            text-shadow: 0 0 5px var(--neon-cyan), 0 0 10px rgba(0, 243, 255, 0.5);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.4);
         }
 
-        /* Cyber Buttons */
+        /* Cyber Buttons - Cleaner, slightly rounded cut */
         .btn-cyber {
             position: relative;
             display: flex;
             align-items: center;
             justify-content: space-between;
             width: 100%;
-            padding: 1rem 1.5rem;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
             color: white;
             text-decoration: none;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             font-weight: 600;
             transition: all 0.3s ease;
-            clip-path: polygon(0 0, 95% 0, 100% 20%, 100% 100%, 5% 100%, 0 80%);
+            /* Subtle cyber cut on bottom right */
+            clip-path: polygon(0 0, 100% 0, 100% 75%, 97% 100%, 0 100%);
         }
 
-        /* Instagram Button (Purple/Pink Accent) */
+        /* YouTube Button */
+        .btn-yt {
+            border-left: 3px solid rgba(255, 0, 60, 0.5);
+        }
+        .btn-yt:hover {
+            background: rgba(255, 0, 60, 0.05);
+            border-color: rgba(255, 0, 60, 0.4);
+            border-left: 3px solid var(--neon-red);
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.2);
+        }
+        .btn-yt i { color: #ff4d6d; }
+        .btn-yt:hover i { color: var(--neon-red); text-shadow: 0 0 8px var(--neon-red); }
+
+        /* Instagram Button */
         .btn-ig {
-            border-color: rgba(181, 55, 242, 0.5);
-            border-left: 4px solid var(--neon-purple);
+            border-left: 3px solid rgba(181, 55, 242, 0.5);
         }
         .btn-ig:hover {
-            background: rgba(181, 55, 242, 0.15);
-            border-color: var(--neon-purple);
-            box-shadow: 0 0 15px rgba(181, 55, 242, 0.5), inset 0 0 10px rgba(181, 55, 242, 0.2);
-            text-shadow: 0 0 8px var(--neon-purple);
+            background: rgba(181, 55, 242, 0.05);
+            border-color: rgba(181, 55, 242, 0.4);
+            border-left: 3px solid var(--neon-purple);
+            box-shadow: 0 0 15px rgba(181, 55, 242, 0.2);
         }
-        .btn-ig i { color: var(--neon-purple); }
-        .btn-ig:hover i { text-shadow: 0 0 10px var(--neon-purple); }
+        .btn-ig i { color: #d67dff; }
+        .btn-ig:hover i { color: var(--neon-purple); text-shadow: 0 0 8px var(--neon-purple); }
 
-        /* TikTok Button (Cyan Accent) */
+        /* TikTok Button */
         .btn-tk {
-            border-color: rgba(0, 243, 255, 0.5);
-            border-left: 4px solid var(--neon-cyan);
+            border-left: 3px solid rgba(0, 243, 255, 0.5);
         }
         .btn-tk:hover {
-            background: rgba(0, 243, 255, 0.15);
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5), inset 0 0 10px rgba(0, 243, 255, 0.2);
-            text-shadow: 0 0 8px var(--neon-cyan);
+            background: rgba(0, 243, 255, 0.05);
+            border-color: rgba(0, 243, 255, 0.4);
+            border-left: 3px solid var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
         }
-        .btn-tk i { color: var(--neon-cyan); }
-        .btn-tk:hover i { text-shadow: 0 0 10px var(--neon-cyan); }
-
-        /* Hover Glitch Effect Setup */
-        .btn-cyber .hover-text {
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Decorative Corners on Card */
-        .corner {
-            position: absolute;
-            width: 15px;
-            height: 15px;
-            border: 2px solid transparent;
-        }
-        .corner-tl { top: 0; left: 0; border-top-color: var(--neon-cyan); border-left-color: var(--neon-cyan); }
-        .corner-tr { top: 0; right: 0; border-top-color: var(--neon-purple); border-right-color: var(--neon-purple); }
-        .corner-bl { bottom: 0; left: 0; border-bottom-color: var(--neon-purple); border-left-color: var(--neon-purple); }
-        .corner-br { bottom: 0; right: 0; border-bottom-color: var(--neon-cyan); border-right-color: var(--neon-cyan); }
+        .btn-tk i { color: #80f9ff; }
+        .btn-tk:hover i { color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
     </style>
 </head>
 <body>
@@ -193,44 +204,56 @@
 
     <!-- Main Content -->
     <main class="content-wrapper">
-        <div class="cyber-card w-full max-w-md mx-auto p-8 rounded-lg">
-            <!-- Decorative Corners -->
-            <div class="corner corner-tl"></div>
-            <div class="corner corner-tr"></div>
-            <div class="corner corner-bl"></div>
-            <div class="corner corner-br"></div>
-
-            <!-- Profile Section -->
-            <div class="text-center mb-10">
-                <div class="avatar-container mb-6">
+        <div class="cyber-card w-full max-w-md mx-auto p-8">
+            
+            <!-- Profile Header -->
+            <header class="text-center mb-8">
+                <div class="avatar-container mb-5">
                     <div class="avatar-inner">
-                        <!-- Placeholder futuristic image -->
-                        <img src="https://placehold.co/150x150/030308/00f3ff?text=SYS+OP" alt="Profile" class="w-full h-full object-cover mix-blend-screen opacity-90 hover:opacity-100 transition-opacity">
+                        <!-- Update this with your actual image URL later -->
+                        <img src="https://placehold.co/150x150/030308/00f3ff?text=RO" alt="Ramadan Osmail" class="w-full h-full object-cover mix-blend-screen opacity-90 hover:opacity-100 transition-opacity">
                     </div>
                 </div>
                 
-                <h1 class="text-4xl font-bold text-white tracking-wider mb-2 text-glow-cyan">
-                    NEXUS <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#00f3ff] to-[#b537f2]">LINK</span>
+                <h1 class="text-3xl font-bold text-white tracking-widest mb-1 text-glow-cyan">
+                    RAMADAN <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#00f3ff] to-[#b537f2]">OSMAIL</span>
                 </h1>
                 
-                <div class="inline-block bg-black/50 border border-[#b537f2]/30 px-3 py-1 rounded text-sm font-mono text-[#b537f2] tracking-widest uppercase">
-                    Status: <span class="text-[#00f3ff]">Online</span> // Initializing...
-                </div>
-            </div>
-
-            <!-- Links Section -->
-            <div class="flex flex-col gap-5">
+                <!-- Website Bio/Description -->
+                <p class="text-gray-400 text-sm font-mono mb-4 px-4">
+                    Creative tech enthusiast. Building AI automations, DIY robotics, and content.
+                </p>
                 
+                <div class="inline-block bg-black/60 border border-[#00f3ff]/20 px-3 py-1 rounded text-xs font-mono text-gray-300 tracking-widest uppercase">
+                    SYS.OP: <span class="text-[#00f3ff]">Online</span>
+                </div>
+            </header>
+
+            <!-- Navigation / Links Section -->
+            <nav class="flex flex-col gap-4">
+                
+                <!-- YouTube Link -->
+                <a href="https://www.youtube.com/@Som.Creative" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="btn-cyber btn-yt group">
+                    <span class="flex items-center gap-3">
+                        <i class="fab fa-youtube text-xl transition-transform group-hover:scale-110"></i>
+                        <span class="mt-1">YouTube</span>
+                    </span>
+                    <span class="font-mono text-xs opacity-60 group-hover:opacity-100 transition-opacity mt-1">@Som.Creative</span>
+                </a>
+
                 <!-- Instagram Link -->
-                <a href="https://www.instagram.com/daily.aitool?exln=MWg0d3RlaXcxYjZtNg%3D%3D&utm_source=qr" 
+                <a href="https://www.instagram.com/daily.aitool" 
                    target="_blank" 
                    rel="noopener noreferrer" 
                    class="btn-cyber btn-ig group">
                     <span class="flex items-center gap-3">
-                        <i class="fab fa-instagram text-2xl transition-transform group-hover:scale-110"></i>
-                        <span class="hover-text mt-1">Instagram</span>
+                        <i class="fab fa-instagram text-xl transition-transform group-hover:scale-110"></i>
+                        <span class="mt-1">Instagram</span>
                     </span>
-                    <span class="font-mono text-xs opacity-70 group-hover:opacity-100 transition-opacity mt-1">daily.aitool</span>
+                    <span class="font-mono text-xs opacity-60 group-hover:opacity-100 transition-opacity mt-1">daily.aitool</span>
                 </a>
 
                 <!-- TikTok Link -->
@@ -239,20 +262,20 @@
                    rel="noopener noreferrer" 
                    class="btn-cyber btn-tk group">
                     <span class="flex items-center gap-3">
-                        <i class="fab fa-tiktok text-2xl transition-transform group-hover:scale-110"></i>
-                        <span class="hover-text mt-1">TikTok</span>
+                        <i class="fab fa-tiktok text-xl transition-transform group-hover:scale-110"></i>
+                        <span class="mt-1">TikTok</span>
                     </span>
-                    <span class="font-mono text-xs opacity-70 group-hover:opacity-100 transition-opacity mt-1">@ramadan_1431</span>
+                    <span class="font-mono text-xs opacity-60 group-hover:opacity-100 transition-opacity mt-1">@ramadan_1431</span>
                 </a>
 
-            </div>
+            </nav>
 
-            <!-- Footer / System Data -->
-            <div class="mt-10 pt-4 border-t border-white/10 flex justify-between items-center text-[10px] font-mono text-gray-500 uppercase tracking-widest">
-                <span>SYS_VER: 9.4.2</span>
+            <!-- Standard Website Footer -->
+            <footer class="mt-10 pt-5 border-t border-white/5 flex justify-between items-center text-[10px] font-mono text-gray-500 uppercase tracking-widest">
+                <span>© 2026</span>
                 <span>SEC_L: ALPHA</span>
-                <span class="text-[#00f3ff] animate-pulse">CONN: ESTABLISHED</span>
-            </div>
+                <span class="text-[#00f3ff] animate-pulse">CONN: SECURE</span>
+            </footer>
         </div>
     </main>
 
@@ -264,17 +287,13 @@
         let width, height;
         let particles = [];
         
-        // Configuration
-        const particleCount = 70; // Adjust for density
-        const connectionDistance = 120;
-        const colors = ['#00f3ff', '#b537f2', '#ffffff'];
+        // Configuration - Reduced particle count for a cleaner look
+        const particleCount = 50; 
+        const connectionDistance = 150;
+        const colors = ['#00f3ff', '#b537f2', '#4a4a6a']; // Subtler colors
 
-        // Mouse interaction
-        let mouse = {
-            x: null,
-            y: null,
-            radius: 150
-        };
+        // Mouse interaction tracker
+        let mouse = { x: null, y: null, radius: 200 };
 
         window.addEventListener('mousemove', function(event) {
             mouse.x = event.x;
@@ -300,14 +319,12 @@
             constructor() {
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
-                this.size = Math.random() * 2 + 0.5;
-                this.baseX = this.x;
-                this.baseY = this.y;
-                this.density = (Math.random() * 30) + 1;
+                this.size = Math.random() * 1.5 + 0.5; // Slightly smaller particles
+                this.density = (Math.random() * 20) + 1;
                 
-                // Velocity
-                this.vx = (Math.random() - 0.5) * 1.5;
-                this.vy = (Math.random() - 0.5) * 1.5;
+                // Slower, smoother velocity
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
                 
                 this.color = colors[Math.floor(Math.random() * colors.length)];
             }
@@ -316,23 +333,16 @@
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fillStyle = this.color;
-                // Add glow to particles
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = this.color;
                 ctx.fill();
-                ctx.shadowBlur = 0; // reset for lines
             }
 
             update() {
-                // Movement
                 this.x += this.vx;
                 this.y += this.vy;
 
-                // Bounce off edges
                 if (this.x < 0 || this.x > width) this.vx *= -1;
                 if (this.y < 0 || this.y > height) this.vy *= -1;
 
-                // Mouse interactivity (push away)
                 if (mouse.x != null) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
@@ -345,8 +355,8 @@
                         const directionX = forceDirectionX * force * this.density;
                         const directionY = forceDirectionY * force * this.density;
                         
-                        this.x -= directionX;
-                        this.y -= directionY;
+                        this.x -= directionX * 0.05; // Smoother mouse repel
+                        this.y -= directionY * 0.05;
                     }
                 }
             }
@@ -361,8 +371,8 @@
 
                     if (distance < connectionDistance) {
                         let opacity = 1 - (distance / connectionDistance);
-                        ctx.strokeStyle = `rgba(0, 243, 255, ${opacity * 0.2})`;
-                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = `rgba(0, 243, 255, ${opacity * 0.15})`; // Softer lines
+                        ctx.lineWidth = 0.5;
                         ctx.beginPath();
                         ctx.moveTo(particles[a].x, particles[a].y);
                         ctx.lineTo(particles[b].x, particles[b].y);
@@ -375,10 +385,10 @@
         function animate() {
             ctx.clearRect(0, 0, width, height);
             
-            // Draw a subtle gradient overlay
-            let gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width/2);
-            gradient.addColorStop(0, 'rgba(5, 5, 16, 0.8)');
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
+            // Smoother gradient background
+            let gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
+            gradient.addColorStop(0, 'rgba(10, 10, 18, 1)');
+            gradient.addColorStop(1, 'rgba(2, 2, 5, 1)');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, width, height);
 
@@ -390,12 +400,8 @@
             requestAnimationFrame(animate);
         }
 
-        // Handle resize
-        window.addEventListener('resize', function() {
-            init();
-        });
-
-        // Start
+        window.addEventListener('resize', init);
+        
         init();
         animate();
     </script>
