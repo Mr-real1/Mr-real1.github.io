@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -365,6 +365,48 @@
       color: var(--text);
     }
 
+    /* Timezone Widget Styles */
+    .timezone-widget {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .timezone-widget label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .timezone-widget select {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+
+    .timezone-display {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      background: rgba(31, 111, 235, 0.06);
+      padding: 12px 16px;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid rgba(31, 111, 235, 0.12);
+    }
+
     .skills-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0,1fr));
@@ -720,6 +762,13 @@
               <li><span>Focus</span> <strong>Robotics & digital media</strong></li>
               <li><span>Available</span> <strong>Open to freelance work</strong></li>
             </ul>
+
+            <!-- Universal Time Zone Widget -->
+            <div class="timezone-widget">
+              <label for="timezone-select"><i class="fa-solid fa-globe"></i> World Clock</label>
+              <select id="timezone-select" aria-label="Select Timezone"></select>
+              <div id="timezone-clock" class="timezone-display">--:--:--</div>
+            </div>
           </aside>
         </div>
       </div>
@@ -859,9 +908,9 @@
           <div class="contact-box">
             <p>Whether you need a portfolio site, AI workflow concept, automation idea, or a digital showcase, I’m happy to talk.</p>
             <div class="contact-links">
-            
               <a class="contact-link" href="https://mail.google.com/mail/?view=cm&fs=1&to=ramadanosmail11@gmail.com" target="_blank">
-    <i class="fa-solid fa-envelope"></i> Send Email </a>
+                <i class="fa-solid fa-envelope"></i> Send Email
+              </a>
               <a class="contact-link" href="https://www.youtube.com/@Som.Creative" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube"></i> My youtube channel</a>
               <a class="contact-link" href="https://www.instagram.com/daily.aitool" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i> My Instagram</a>
             </div>
@@ -890,5 +939,57 @@
       <span>© 2026 Ramadan Osmail</span>
     </div>
   </footer>
+
+  <!-- Universal Time Zone Script -->
+  <script>
+    const tzSelect = document.getElementById('timezone-select');
+    const clockDisplay = document.getElementById('timezone-clock');
+
+    // Get all supported IANA time zones or fallback list
+    const timeZones = Intl.supportedValuesOf ? Intl.supportedValuesOf('timeZone') : [
+      'UTC', 'America/New_York', 'America/Los_Angeles', 'Europe/London', 
+      'Europe/Paris', 'Asia/Tokyo', 'Asia/Dubai', 'Australia/Sydney'
+    ];
+
+    const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    // Populate dropdown
+    timeZones.forEach(tz => {
+      const option = document.createElement('option');
+      option.value = tz;
+      option.textContent = tz.replace(/_/g, ' ');
+      if (tz === userTz) {
+        option.selected = true;
+      }
+      tzSelect.appendChild(option);
+    });
+
+    // Fallback if user's timezone wasn't explicitly caught
+    if (!tzSelect.value && timeZones.length > 0) {
+      tzSelect.value = timeZones[0];
+    }
+
+    function updateClock() {
+      const selectedTz = tzSelect.value;
+      try {
+        const now = new Date();
+        const formatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: selectedTz,
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        });
+        clockDisplay.textContent = formatter.format(now);
+      } catch (e) {
+        clockDisplay.textContent = "Invalid Timezone";
+      }
+    }
+
+    tzSelect.addEventListener('change', updateClock);
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
 </body>
 </html>
+```[cite: 1]
