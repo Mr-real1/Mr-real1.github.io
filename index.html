@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -11,8 +11,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <!-- Added Supabase Client Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --bg: #f6f7fb;
@@ -176,8 +174,6 @@
       border-radius: 999px;
       font-weight: 700;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      cursor: pointer;
-      border: none;
     }
 
     .button:hover {
@@ -568,29 +564,6 @@
       color: var(--primary);
     }
 
-    /* Auth Section Styles */
-    .auth-card {
-      max-width: 450px;
-      margin: 20px auto;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      padding: 24px;
-      box-shadow: var(--shadow);
-    }
-    .auth-card input {
-      width: 100%;
-      padding: 12px 16px;
-      margin-bottom: 12px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      font-family: inherit;
-    }
-    .auth-actions {
-      display: flex;
-      gap: 10px;
-    }
-
     footer {
       padding: 30px 0 55px;
       color: var(--muted);
@@ -667,7 +640,6 @@
         <a href="#skills">Skills</a>
         <a href="#projects">Projects</a>
         <a href="#experience">Experience</a>
-        <a href="#auth-section">Account</a>
         <a href="#contact" class="nav-cta">Contact</a>
       </nav>
     </div>
@@ -877,30 +849,6 @@
       </div>
     </section>
 
-    <!-- Supabase Auth Section -->
-    <section id="auth-section">
-      <div class="container">
-        <div class="section-head">
-          <h2>Account Portal</h2>
-          <p>Sign up or log in to manage your session.</p>
-        </div>
-        <div class="auth-card">
-          <div id="auth-logged-out">
-            <input type="email" id="auth-email" placeholder="Email address" />
-            <input type="password" id="auth-password" placeholder="Password" />
-            <div class="auth-actions">
-              <button class="button primary" onclick="handleSignUp()" style="flex:1;">Sign Up</button>
-              <button class="button secondary" onclick="handleLogin()" style="flex:1;">Log In</button>
-            </div>
-          </div>
-          <div id="auth-logged-in" style="display: none;">
-            <p id="user-display-email" style="font-weight: 600; margin-bottom: 16px;"></p>
-            <button class="button secondary" onclick="handleLogout()" style="width: 100%;">Log Out</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section id="contact">
       <div class="container">
         <div class="section-head">
@@ -912,9 +860,11 @@
           <div class="contact-box">
             <p>Whether you need a portfolio site, AI workflow concept, automation idea, or a digital showcase, I’m happy to talk.</p>
             <div class="contact-links">
-              <a class="contact-link" href="mailto:ramadan.osmail@example.com"><i class="fa-solid fa-envelope"></i> ramadan.osmail@example.com</a>
-              <a class="contact-link" href="https://www.youtube.com/@Som.Creative" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube"></i> @Som.Creative</a>
-              <a class="contact-link" href="https://www.instagram.com/daily.aitool" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i> daily.aitool</a>
+            
+              <a class="contact-link" href="https://mail.google.com/mail/?view=cm&fs=1&to=ramadanosmail11@gmail.com" target="_blank">
+    <i class="fa-solid fa-envelope"></i> Send Email </a>
+              <a class="contact-link" href="https://www.youtube.com/@Som.Creative" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube"></i> My youtube channel</a>
+              <a class="contact-link" href="https://www.instagram.com/daily.aitool" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i> My Instagram</a>
             </div>
           </div>
 
@@ -939,65 +889,7 @@
   <footer>
     <div class="container footer-row">
       <span>© 2026 Ramadan Osmail</span>
-      <span>Built with creativity and code.</span>
     </div>
   </footer>
-
-  <!-- Supabase Initialization & Logic Script -->
-  <script>
-    // Project URL and your extracted publishable key
-    const SUPABASE_URL = 'https://ngobfbqxgjsspgevhray.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_e-lRQsxyXiLPXXVnMVwKzw_YNWOYRDy';
-    
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    async function checkUserSession() {
-      const { data: { session } } = await supabase.auth.getSession();
-      updateAuthUI(session);
-    }
-
-    function updateAuthUI(session) {
-      const loggedOutDiv = document.getElementById('auth-logged-out');
-      const loggedInDiv = document.getElementById('auth-logged-in');
-      const emailDisplay = document.getElementById('user-display-email');
-
-      if (session) {
-        loggedOutDiv.style.display = 'none';
-        loggedInDiv.style.display = 'block';
-        emailDisplay.textContent = `Logged in as: ${session.user.email}`;
-      } else {
-        loggedOutDiv.style.display = 'block';
-        loggedInDiv.style.display = 'none';
-      }
-    }
-
-    async function handleSignUp() {
-      const email = document.getElementById('auth-email').value;
-      const password = document.getElementById('auth-password').value;
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) alert(error.message);
-      else alert('Sign up successful! Check your email for confirmation if required.');
-    }
-
-    async function handleLogin() {
-      const email = document.getElementById('auth-email').value;
-      const password = document.getElementById('auth-password').value;
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) alert(error.message);
-      else {
-        alert('Logged in successfully!');
-        updateAuthUI(data.session);
-      }
-    }
-
-    async function handleLogout() {
-      await supabase.auth.signOut();
-      alert('Logged out successfully!');
-      checkUserSession();
-    }
-
-    // Run session check on page load
-    checkUserSession();
-  </script>
 </body>
 </html>
