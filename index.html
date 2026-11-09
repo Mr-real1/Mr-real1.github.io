@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -50,8 +50,8 @@
     .topbar {
       position: sticky;
       top: 0;
-      z-index: 20;
-      background: rgba(255,255,255,0.8);
+      z-index: 100;
+      background: rgba(255,255,255,0.9);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid rgba(148, 163, 184, 0.18);
     }
@@ -88,7 +88,6 @@
       display: flex;
       gap: 28px;
       align-items: center;
-      flex-wrap: wrap;
     }
 
     .nav a {
@@ -101,12 +100,22 @@
     .nav a:hover { color: var(--text); }
 
     .nav-cta {
-      padding: 12px 20px;
+      padding: 10px 18px;
       background: var(--text);
-      color: white;
+      color: white !important;
       border-radius: 999px;
       font-weight: 700;
       box-shadow: var(--shadow);
+    }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      color: var(--text);
+      cursor: pointer;
+      padding: 8px;
     }
 
     .hero {
@@ -621,24 +630,49 @@
       padding-top: 22px;
     }
 
+    /* Responsive Mobile Navigation Styles */
     @media (max-width: 900px) {
+      .menu-toggle {
+        display: block;
+      }
+
+      .nav {
+        position: absolute;
+        top: 72px;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(14px);
+        flex-direction: column;
+        align-items: stretch;
+        padding: 24px;
+        gap: 16px;
+        border-bottom: 1px solid var(--line);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        display: none; /* hidden by default */
+      }
+
+      .nav.active {
+        display: flex; /* shown when toggled */
+      }
+
+      .nav a {
+        text-align: center;
+        padding: 10px 0;
+        font-size: 1.05rem;
+      }
+
+      .nav-cta {
+        text-align: center;
+        border-radius: 12px;
+      }
+
       .hero-grid,
       .about,
       .contact-wrap,
       .skills-grid,
       .projects-grid {
         grid-template-columns: 1fr;
-      }
-
-      .topbar-inner {
-        flex-direction: column;
-        justify-content: center;
-        padding: 18px 0;
-        gap: 12px;
-      }
-
-      .nav {
-        justify-content: center;
       }
     }
 
@@ -677,12 +711,33 @@
         <img class="brand-logo" src="logo.png" alt="Ramadan Osmail logo" />
         <span>Ramadan Osmail</span>
       </a>
-      <nav class="nav" aria-label="Main navigation">
-        <a href="#about">About</a>
-        <a href="#skills">Skills</a>
-        <a href="#projects">Projects</a>
-        <a href="#experience">Experience</a>
-        <a href="#contact" class="nav-cta">Contact</a>
+
+      <!-- Hamburger Menu Button -->
+      <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation menu">
+        <i class="fa-solid fa-bars" id="menu-icon"></i>
+      </button>
+
+      <nav class="nav" id="nav-menu" aria-label="Main navigation">
+        <a href="#about" class="nav-link">About</a>
+        <a href="#skills" class="nav-link">Skills</a>
+        <a href="#projects" class="nav-link">Projects</a>
+        <a href="#experience" class="nav-link">Experience</a>
+        <div style="display: flex; align-items: center; gap: 10px; background: #f1f5f9; border: 1px solid #dfe7f6; padding: 6px 12px; border-radius: 999px;">
+  <i class="fa-solid fa-globe" style="color: #1f6feb; font-size: 0.85rem;"></i>
+  <select id="timezone-select" aria-label="Select Timezone" style="background: transparent; border: none; color: #152033; font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; outline: none;">
+    <option value="UTC">UTC</option>
+    <option value="America/New_York">America/New York</option>
+    <option value="America/Toronto" selected>America/Toronto</option>
+    <option value="America/Los_Angeles">America/Los Angeles</option>
+    <option value="Europe/London">Europe/London</option>
+    <option value="Europe/Paris">Europe/Paris</option>
+    <option value="Asia/Tokyo">Asia/Tokyo</option>
+    <option value="Asia/Dubai">Asia/Dubai</option>
+    <option value="Australia/Sydney">Australia/Sydney</option>
+  </select>
+  <span id="timezone-clock" style="font-size: 0.86rem; font-weight: 700; color: #123d8f; white-space: nowrap;">08:55:00 PM</span>
+</div>
+        <a href="#contact" class="nav-link nav-cta">Contact</a>
       </nav>
     </div>
   </header>
@@ -940,12 +995,38 @@
     </div>
   </footer>
 
-  <!-- Universal Time Zone Script -->
+  <!-- Site Interactive Scripts (Menu Toggle & World Clock) -->
   <script>
+    // Mobile Menu Toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const navMenu = document.getElementById('nav-menu');
+    const menuIcon = document.getElementById('menu-icon');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    menuToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('active');
+      if (navMenu.classList.contains('active')) {
+        menuIcon.classList.remove('fa-bars');
+        menuIcon.classList.add('fa-xmark');
+      } else {
+        menuIcon.classList.remove('fa-xmark');
+        menuIcon.classList.add('fa-bars');
+      }
+    });
+
+    // Close menu automatically when clicking any navigation link on mobile
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        navMenu.classList.remove('active');
+        menuIcon.classList.remove('fa-xmark');
+        menuIcon.classList.add('fa-bars');
+      });
+    });
+
+    // World Clock & Time Zone Selector
     const tzSelect = document.getElementById('timezone-select');
     const clockDisplay = document.getElementById('timezone-clock');
 
-    // Get all supported IANA time zones or fallback list
     const timeZones = Intl.supportedValuesOf ? Intl.supportedValuesOf('timeZone') : [
       'UTC', 'America/New_York', 'America/Los_Angeles', 'Europe/London', 
       'Europe/Paris', 'Asia/Tokyo', 'Asia/Dubai', 'Australia/Sydney'
@@ -953,7 +1034,6 @@
 
     const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    // Populate dropdown
     timeZones.forEach(tz => {
       const option = document.createElement('option');
       option.value = tz;
@@ -964,7 +1044,6 @@
       tzSelect.appendChild(option);
     });
 
-    // Fallback if user's timezone wasn't explicitly caught
     if (!tzSelect.value && timeZones.length > 0) {
       tzSelect.value = timeZones[0];
     }
