@@ -1,361 +1,1081 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tic Tac Toe Online</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;padding:20px;background:#0c1020;color:white;font-family:Arial,sans-serif}
-main{max-width:650px;margin:auto}
-h1{text-align:center;color:#91aaff}
-.card{background:#171d33;padding:18px;border-radius:18px;margin:15px 0}
-input{width:100%;padding:13px;border-radius:10px;border:1px solid #445071;background:#0f1528;color:white;margin:8px 0}
-button{padding:13px;border:0;border-radius:10px;background:#718cff;color:white;font-weight:bold;cursor:pointer}
-button:disabled{opacity:.4}
-.actions{display:flex;gap:10px;margin:10px 0}
-.actions button{flex:1}
-.hidden{display:none!important}
-.hint{color:#aab4d0;font-size:13px}
-.roomcode{font-size:27px;letter-spacing:6px;color:#b9caff;font-weight:bold}
-.players{display:flex;gap:10px}
-.player{flex:1;text-align:center;background:#10172b;padding:12px;border-radius:12px}
-.active{outline:2px solid #65dfad}
-.board{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;max-width:390px;margin:18px auto}
-.cell{aspect-ratio:1;font-size:55px;background:#263252;color:white}
-.x{color:#79a0ff}.o{color:#ff9bd1}
-.status{text-align:center;background:#10172b;padding:15px;border-radius:12px}
-.chatlog{height:200px;overflow:auto;background:#0f1528;padding:12px;border-radius:12px}
-.msg{padding:9px;margin:6px 0;background:#263252;border-radius:10px;overflow-wrap:anywhere}
-.mine{text-align:right;background:#354a83}
-.emoji{font-size:20px;padding:8px;background:#263252;margin:3px}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tic Tac Toe Online — Multiplayer Arena</title>
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: #111827;
+      --bg-surface: #1e293b;
+      --border: rgba(148, 163, 184, 0.16);
+      --blue: #3b82f6;
+      --blue-glow: rgba(59, 130, 246, 0.45);
+      --purple: #a855f7;
+      --purple-glow: rgba(168, 85, 247, 0.45);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #22c55e;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at top left, #17153b 0%, var(--bg-dark) 48%, #070a12 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 8px 0 4px;
+    }
+
+    .site-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+    }
+
+    .header h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #60a5fa, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.3px;
+    }
+
+    .card {
+      background: rgba(17, 24, 39, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(10px);
+    }
+
+    .label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 14px;
+      color: var(--text-main);
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+    }
+
+    .btn-small {
+      width: auto;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      border-radius: 10px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin: 16px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .divider span {
+      padding: 0 10px;
+    }
+
+    .join-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .join-row input {
+      text-align: center;
+      letter-spacing: 3px;
+      font-weight: 700;
+    }
+
+    .join-row .btn {
+      width: auto;
+      min-width: 110px;
+    }
+
+    .alert {
+      background: rgba(239, 68, 68, 0.14);
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      color: #fecaca;
+      padding: 11px 14px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      line-height: 1.4;
+      display: none;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .game-screen {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .room-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .code-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 12px;
+    }
+
+    .code-badge span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .code-badge strong {
+      font-size: 1.15rem;
+      letter-spacing: 2px;
+      color: #93c5fd;
+    }
+
+    .scoreboard {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 8px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .player-box {
+      background: var(--bg-surface);
+      border: 2px solid transparent;
+      border-radius: 14px;
+      padding: 10px;
+      text-align: center;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      overflow: hidden;
+    }
+
+    .player-box.active-x {
+      border-color: var(--blue);
+      box-shadow: 0 0 16px var(--blue-glow);
+    }
+
+    .player-box.active-o {
+      border-color: var(--purple);
+      box-shadow: 0 0 16px var(--purple-glow);
+    }
+
+    .player-tag {
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .tag-x { color: #60a5fa; }
+    .tag-o { color: #c084fc; }
+
+    .player-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 3px 0;
+    }
+
+    .player-score {
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .draws-box {
+      text-align: center;
+      padding: 6px 10px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .draws-box strong {
+      display: block;
+      font-size: 1.1rem;
+      color: var(--text-main);
+    }
+
+    .status-banner {
+      margin-top: 12px;
+      text-align: center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      background: rgba(59, 130, 246, 0.14);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #dbeafe;
+    }
+
+    .status-banner.win {
+      background: rgba(34, 197, 94, 0.16);
+      border-color: rgba(34, 197, 94, 0.45);
+      color: #bbf7d0;
+    }
+
+    .status-banner.draw {
+      background: rgba(168, 85, 247, 0.16);
+      border-color: rgba(168, 85, 247, 0.45);
+      color: #e9d5ff;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .cell {
+      aspect-ratio: 1 / 1;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      font-size: 2.6rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.18s, transform 0.12s, border-color 0.2s;
+    }
+
+    .cell:active:not(.disabled) {
+      transform: scale(0.95);
+    }
+
+    .cell.disabled {
+      cursor: default;
+    }
+
+    .cell.x {
+      color: var(--blue);
+      text-shadow: 0 0 18px var(--blue-glow);
+      animation: popIn 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    .cell.o {
+      color: var(--purple);
+      text-shadow: 0 0 18px var(--purple-glow);
+      animation: popIn 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    .cell.win-cell {
+      background: rgba(34, 197, 94, 0.18);
+      border-color: var(--success);
+      box-shadow: 0 0 18px rgba(34, 197, 94, 0.3);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.4); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .chat-header h2 {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .chat-messages {
+      height: 175px;
+      overflow-y: auto;
+      background: rgba(9, 13, 22, 0.75);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .chat-empty {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-align: center;
+      margin: auto;
+    }
+
+    .msg {
+      max-width: 85%;
+      padding: 8px 11px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.35;
+      word-wrap: break-word;
+    }
+
+    .msg.mine {
+      align-self: flex-end;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.32), rgba(168, 85, 247, 0.32));
+      border: 1px solid rgba(147, 197, 253, 0.3);
+    }
+
+    .msg.theirs {
+      align-self: flex-start;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+    }
+
+    .msg-sender {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #93c5fd;
+      margin-bottom: 2px;
+    }
+
+    .msg.theirs .msg-sender {
+      color: #d8b4fe;
+    }
+
+    .emoji-bar {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .emoji-btn {
+      flex: 1;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 0;
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.15s;
+    }
+
+    .emoji-btn:active {
+      transform: scale(0.9);
+      background: rgba(59, 130, 246, 0.25);
+    }
+
+    .chat-form {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-form input {
+      flex: 1;
+      padding: 11px 12px;
+    }
+
+    .chat-form .btn {
+      width: auto;
+      padding: 11px 16px;
+    }
+  </style>
 </head>
 <body>
-<main>
-<h1>⭕ TIC TAC TOE ✕</h1>
-<p style="text-align:center">Private 1v1 · Play and chat online</p>
+  <div class="app-container">
+    <header class="header">
+      <img src="logo.png" alt="Logo" class="site-logo" onerror="this.style.display='none'" />
+      <h1>Tic Tac Toe Live</h1>
+    </header>
 
-<section class="card" id="lobby">
-<h3>Play with a friend</h3>
-<input id="playerName" placeholder="Enter your name" maxlength="18">
-<div class="actions">
-<button id="createBtn">Create Room</button>
-<button id="showJoin">Join Room</button>
-</div>
-<div id="joinArea" class="hidden">
-<input id="roomInput" placeholder="Enter 6-digit code" maxlength="6">
-<button id="joinBtn">Join Game</button>
-</div>
-<p id="message" class="hint">Create a room and share the code with your friend.</p>
-</section>
+    <div id="errorBox" class="alert"></div>
 
-<section class="card hidden" id="game">
-<div style="display:flex;justify-content:space-between;align-items:center">
-<h3>Private Game</h3>
-<button id="leaveBtn">Leave</button>
-</div>
-<p class="hint">ROOM CODE</p>
-<div class="roomcode" id="roomCode"></div>
-<button id="copyBtn">Copy Code</button>
+    <!-- LOBBY SCREEN -->
+    <section id="lobbyScreen" class="card">
+      <div style="margin-bottom: 16px;">
+        <label class="label" for="usernameInput">Your Username</label>
+        <input type="text" id="usernameInput" maxlength="20" placeholder="Enter your name..." autocomplete="off" />
+      </div>
 
-<div class="players">
-<div class="player" id="playerX">
-<h2 style="color:#79a0ff">X</h2>
-<strong id="nameX">Player 1</strong>
-<p id="scoreX">Wins: 0</p>
-</div>
-<div class="player" id="playerO">
-<h2 style="color:#ff9bd1">O</h2>
-<strong id="nameO">Player 2</strong>
-<p id="scoreO">Wins: 0</p>
-</div>
-</div>
+      <button id="createBtn" class="btn btn-primary" disabled>Connecting...</button>
 
-<div class="status" id="status">Waiting for friend...</div>
+      <div class="divider"><span>OR JOIN A FRIEND</span></div>
 
-<div class="board">
-<button class="cell" data-i="0"></button>
-<button class="cell" data-i="1"></button>
-<button class="cell" data-i="2"></button>
-<button class="cell" data-i="3"></button>
-<button class="cell" data-i="4"></button>
-<button class="cell" data-i="5"></button>
-<button class="cell" data-i="6"></button>
-<button class="cell" data-i="7"></button>
-<button class="cell" data-i="8"></button>
-</div>
+      <label class="label" for="codeInput">6-Digit Room Code</label>
+      <div class="join-row">
+        <input type="text" id="codeInput" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="123456" autocomplete="off" />
+        <button id="joinBtn" class="btn btn-secondary" disabled>Join</button>
+      </div>
+    </section>
 
-<div class="actions">
-<button id="rematchBtn" disabled>Request Rematch</button>
-<button id="newGameBtn">New Round</button>
-</div>
-<p id="roundMessage" class="hint"></p>
-</section>
+    <!-- GAME SCREEN -->
+    <section id="gameScreen" class="game-screen hidden">
+      <div class="card">
+        <div class="room-bar">
+          <div class="code-badge">
+            <span>ROOM</span>
+            <strong id="displayRoomCode">------</strong>
+            <button id="copyCodeBtn" class="btn btn-secondary btn-small" type="button">Copy</button>
+          </div>
+          <button id="leaveBtn" class="btn btn-secondary btn-small" type="button">Leave</button>
+        </div>
 
-<section class="card hidden" id="chatCard">
-<h3>💬 Live Chat</h3>
-<div class="chatlog" id="chatLog"></div>
-<div id="emojis">
-<button class="emoji">😂</button>
-<button class="emoji">❤️</button>
-<button class="emoji">🔥</button>
-<button class="emoji">😎</button>
-<button class="emoji">👏</button>
-<button class="emoji">🎉</button>
-<button class="emoji">😭</button>
-</div>
-<form id="chatForm">
-<input id="chatInput" placeholder="Write a message..." maxlength="250">
-<button type="submit">Send</button>
-</form>
-</section>
-</main>
+        <div class="scoreboard">
+          <div id="p1Box" class="player-box">
+            <div class="player-tag tag-x">Player 1 (X)</div>
+            <div id="p1Name" class="player-name">---</div>
+            <div id="p1Score" class="player-score">0</div>
+          </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+          <div class="draws-box">
+            Draws
+            <strong id="drawScore">0</strong>
+          </div>
 
-<script>
-// REPLACE THIS CONFIG WITH YOUR FIREBASE WEB APP CONFIG
-const firebaseConfig = {
-apiKey: "PASTE_YOUR_API_KEY",
-authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
-databaseURL: "https://PASTE_YOUR_DATABASE_URL",
-projectId: "PASTE_YOUR_PROJECT_ID",
-storageBucket: "PASTE_YOUR_PROJECT.appspot.com",
-messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID",
-appId: "PASTE_YOUR_APP_ID"
-};
+          <div id="p2Box" class="player-box">
+            <div class="player-tag tag-o">Player 2 (O)</div>
+            <div id="p2Name" class="player-name">Waiting...</div>
+            <div id="p2Score" class="player-score">0</div>
+          </div>
+        </div>
 
-let db,uid,roomRef,roomId,mySymbol,roomData;
-let chatItems=[];
-let roomListener,chatListener;
+        <div id="statusBanner" class="status-banner">Waiting for Player 2 to join...</div>
 
-const $=id=>document.getElementById(id);
-const cells=[...document.querySelectorAll(".cell")];
-const wins=[
-[0,1,2],[3,4,5],[6,7,8],
-[0,3,6],[1,4,7],[2,5,8],
-[0,4,8],[2,4,6]
-];
+        <div id="board" class="board">
+          <button class="cell" data-index="0" type="button"></button>
+          <button class="cell" data-index="1" type="button"></button>
+          <button class="cell" data-index="2" type="button"></button>
+          <button class="cell" data-index="3" type="button"></button>
+          <button class="cell" data-index="4" type="button"></button>
+          <button class="cell" data-index="5" type="button"></button>
+          <button class="cell" data-index="6" type="button"></button>
+          <button class="cell" data-index="7" type="button"></button>
+          <button class="cell" data-index="8" type="button"></button>
+        </div>
 
-async function connect(){
-if(firebaseConfig.apiKey==="PASTE_YOUR_API_KEY")
-throw Error("Please add your Firebase configuration first.");
-if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
-await firebase.auth().signInAnonymously();
-uid=firebase.auth().currentUser.uid;
-db=firebase.database();
-}
+        <div class="action-row">
+          <button id="newRoundBtn" class="btn btn-secondary" type="button">New Round</button>
+          <button id="rematchBtn" class="btn btn-primary" type="button">Rematch</button>
+        </div>
+      </div>
 
-function enterRoom(code,symbol){
-roomId=code;
-mySymbol=symbol;
-roomRef=db.ref("rooms/"+code);
-$("roomCode").textContent=code;
-$("lobby").classList.add("hidden");
-$("game").classList.remove("hidden");
-$("chatCard").classList.remove("hidden");
-$("chatLog").innerHTML="";
-chatItems=[];
+      <!-- LIVE CHAT -->
+      <div class="card">
+        <div class="chat-header">
+          <h2>Live Room Chat</h2>
+          <span style="font-size: 0.78rem; color: var(--text-muted);">Max 100 chars</span>
+        </div>
 
-roomListener=snap=>{
-if(!snap.exists())return;
-roomData=snap.val();
-render();
-};
-roomRef.on("value",roomListener);
+        <div id="chatMessages" class="chat-messages">
+          <div class="chat-empty">Say hi or tap an emoji below!</div>
+        </div>
 
-chatListener=snap=>{
-chatItems.push(snap.val());
-renderChat();
-};
-roomRef.child("chat").limitToLast(80).on("child_added",chatListener);
-}
+        <div class="emoji-bar">
+          <button class="emoji-btn" type="button" data-emoji="😂">😂</button>
+          <button class="emoji-btn" type="button" data-emoji="❤️">❤️</button>
+          <button class="emoji-btn" type="button" data-emoji="🔥">🔥</button>
+          <button class="emoji-btn" type="button" data-emoji="😎">😎</button>
+          <button class="emoji-btn" type="button" data-emoji="🎉">🎉</button>
+          <button class="emoji-btn" type="button" data-emoji="👏">👏</button>
+        </div>
 
-async function createRoom(){
-let name=$("playerName").value.trim();
-if(!name)return alert("Enter your name first.");
-try{
-await connect();
-let code,ref,snap;
-do{
-code=String(Math.floor(100000+Math.random()*900000));
-ref=db.ref("rooms/"+code);
-snap=await ref.get();
-}while(snap.exists());
+        <form id="chatForm" class="chat-form">
+          <input type="text" id="chatInput" maxlength="100" placeholder="Type a message..." autocomplete="off" />
+          <button id="sendChatBtn" class="btn btn-primary" type="submit">Send</button>
+        </form>
+      </div>
+    </section>
+  </div>
 
-await ref.set({
-players:{X:{uid,name},O:null},
-board:Array(9).fill(""),
-turn:"X",
-status:"waiting",
-winner:null,
-scores:{X:0,O:0},
-round:1,
-rematch:{X:false,O:false}
-});
-enterRoom(code,"X");
-}catch(e){alert(e.message);}
-}
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import {
+      getDatabase,
+      ref,
+      set,
+      get,
+      update,
+      push,
+      onValue,
+      off,
+      serverTimestamp,
+      query,
+      limitToLast
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
-async function joinRoom(){
-let name=$("playerName").value.trim();
-let code=$("roomInput").value.trim();
-if(!name)return alert("Enter your name.");
-if(!/^\d{6}$/.test(code))return alert("Enter the 6-digit code.");
-try{
-await connect();
-let ref=db.ref("rooms/"+code);
-let snap=await ref.get();
-if(!snap.exists())return alert("Room not found.");
-let data=snap.val();
-if(data.players?.X?.uid===uid)return enterRoom(code,"X");
-if(data.players?.O?.uid===uid)return enterRoom(code,"O");
-if(data.players?.O)return alert("Room is full.");
+    const firebaseConfig = {
+      apiKey: "AIzaSyADEpe0LZdVFsuiar14KgCZ87Gc-TD40x8",
+      authDomain: "tic-tac-toe-live-e7f93.firebaseapp.com",
+      databaseURL: "https://tic-tac-toe-live-e7f93-default-rtdb.firebaseio.com",
+      projectId: "tic-tac-toe-live-e7f93",
+      storageBucket: "tic-tac-toe-live-e7f93.firebasestorage.app",
+      messagingSenderId: "730058297460",
+      appId: "1:730058297460:web:c8a897e176b959016d4121"
+    };
 
-let result=await ref.child("players/O").transaction(
-current=>current===null?{uid,name}:undefined
-);
-if(!result.committed)return alert("Room is full.");
-await ref.update({status:"playing"});
-enterRoom(code,"O");
-}catch(e){alert(e.message);}
-}
+    const WIN_PATTERNS = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
 
-function render(){
-let p=roomData.players;
-let board=roomData.board||Array(9).fill("");
-$("nameX").textContent=p.X?.name||"Waiting...";
-$("nameO").textContent=p.O?.name||"Waiting...";
-$("scoreX").textContent="Wins: "+(roomData.scores?.X||0);
-$("scoreO").textContent="Wins: "+(roomData.scores?.O||0);
+    const errorBox = document.getElementById("errorBox");
+    const lobbyScreen = document.getElementById("lobbyScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const usernameInput = document.getElementById("usernameInput");
+    const codeInput = document.getElementById("codeInput");
+    const createBtn = document.getElementById("createBtn");
+    const joinBtn = document.getElementById("joinBtn");
+    const displayRoomCode = document.getElementById("displayRoomCode");
+    const copyCodeBtn = document.getElementById("copyCodeBtn");
+    const leaveBtn = document.getElementById("leaveBtn");
+    const p1Box = document.getElementById("p1Box");
+    const p2Box = document.getElementById("p2Box");
+    const p1NameEl = document.getElementById("p1Name");
+    const p2NameEl = document.getElementById("p2Name");
+    const p1ScoreEl = document.getElementById("p1Score");
+    const p2ScoreEl = document.getElementById("p2Score");
+    const drawScoreEl = document.getElementById("drawScore");
+    const statusBanner = document.getElementById("statusBanner");
+    const cells = Array.from(document.querySelectorAll(".cell"));
+    const newRoundBtn = document.getElementById("newRoundBtn");
+    const rematchBtn = document.getElementById("rematchBtn");
+    const chatMessages = document.getElementById("chatMessages");
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const emojiButtons = Array.from(document.querySelectorAll(".emoji-btn"));
 
-$("playerX").classList.toggle("active",roomData.turn==="X"&&roomData.status==="playing");
-$("playerO").classList.toggle("active",roomData.turn==="O"&&roomData.status==="playing");
+    let app, auth, db;
+    let currentUser = null;
+    let currentRoomId = null;
+    let currentRoomData = null;
+    let mySymbol = null;
+    let myUsername = "";
+    let roomRef = null;
+    let chatQueryRef = null;
+    let lastChatTime = 0;
 
-let line=wins.find(l=>l.every(i=>board[i]&&board[i]===board[l[0]]));
+    function showError(msg) {
+      errorBox.textContent = msg;
+      errorBox.classList.add("show");
+    }
 
-cells.forEach((c,i)=>{
-c.textContent=board[i]||"";
-c.className="cell "+(board[i]==="X"?"x":board[i]==="O"?"o":"");
-if(line?.includes(i))c.style.background="#28534a";
-else c.style.background="#263252";
-c.disabled=roomData.status!=="playing"||!!board[i]||roomData.turn!==mySymbol||!p.O;
-});
+    function clearError() {
+      errorBox.textContent = "";
+      errorBox.classList.remove("show");
+    }
 
-if(!p.O)$("status").textContent="Waiting for your friend...";
-else if(roomData.status==="finished")
-$("status").textContent=roomData.winner==="draw"?"It's a draw!":"🏆 "+p[roomData.winner].name+" wins!";
-else $("status").textContent=roomData.turn===mySymbol?"Your turn!":"Waiting for "+p[roomData.turn].name;
+    try {
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getDatabase(app);
 
-$("rematchBtn").disabled=roomData.status!=="finished"||!p.O;
-$("newGameBtn").disabled=!p.O;
-}
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          currentUser = user;
+          createBtn.disabled = false;
+          joinBtn.disabled = false;
+          createBtn.textContent = "Create Private Room";
+        }
+      });
 
-async function move(i){
-if(!roomData||roomData.status!=="playing"||
-roomData.turn!==mySymbol||roomData.board[i])return;
+      signInAnonymously(auth).catch((err) => {
+        console.error(err);
+        if (err.code === "auth/unauthorized-domain") {
+          showError("Domain not authorized yet: Add your website domain in Firebase Authentication > Settings > Authorized domains.");
+        } else {
+          showError("Connection error: " + err.message);
+        }
+      });
+    } catch (err) {
+      showError("Firebase config error: " + err.message);
+    }
 
-await roomRef.transaction(data=>{
-if(!data||data.status!=="playing"||data.turn!==mySymbol||data.board[i])return;
-let b=[...data.board];
-b[i]=mySymbol;
-data.board=b;
+    const savedName = localStorage.getItem("ttt_username");
+    if (savedName) usernameInput.value = savedName;
 
-if(wins.some(l=>l.every(k=>b[k]===mySymbol))){
-data.status="finished";
-data.winner=mySymbol;
-data.scores[mySymbol]=(data.scores[mySymbol]||0)+1;
-}else if(b.every(Boolean)){
-data.status="finished";
-data.winner="draw";
-}else{
-data.turn=mySymbol==="X"?"O":"X";
-}
-return data;
-});
-}
+    function getCleanUsername() {
+      const clean = usernameInput.value.trim().slice(0, 20);
+      if (!clean) {
+        showError("Please enter a username first.");
+        usernameInput.focus();
+        return null;
+      }
+      localStorage.setItem("ttt_username", clean);
+      return clean;
+    }
 
-async function nextRound(){
-await roomRef.transaction(data=>{
-if(!data||!data.players?.O)return;
-data.board=Array(9).fill("");
-data.turn="X";
-data.status="playing";
-data.winner=null;
-data.round++;
-data.rematch={X:false,O:false};
-return data;
-});
-}
+    function generateRoomCode() {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
 
-async function requestRematch(){
-await roomRef.child("rematch/"+mySymbol).set(true);
-let other=mySymbol==="X"?"O":"X";
-let snap=await roomRef.child("rematch/"+other).get();
-if(snap.val()===true)await nextRound();
-else $("roundMessage").textContent="Waiting for your friend to agree...";
-}
+    createBtn.addEventListener("click", async () => {
+      clearError();
+      if (!currentUser) return showError("Still connecting to server. Please wait 2 seconds.");
+      const name = getCleanUsername();
+      if (!name) return;
 
-async function sendChat(text){
-text=text.trim().slice(0,250);
-if(!text||!roomRef)return;
-await roomRef.child("chat").push({
-uid,
-name:roomData.players[mySymbol].name,
-text,
-createdAt:firebase.database.ServerValue.TIMESTAMP
-});
-}
+      createBtn.disabled = true;
+      createBtn.textContent = "Creating Room...";
 
-function renderChat(){
-let log=$("chatLog");
-log.innerHTML="";
-chatItems.slice(-80).forEach(m=>{
-let div=document.createElement("div");
-div.className="msg"+(m.uid===uid?" mine":"");
-let name=document.createElement("b");
-name.textContent=m.name+": ";
-let text=document.createElement("span");
-text.textContent=m.text;
-div.append(name,text);
-log.append(div);
-});
-log.scrollTop=log.scrollHeight;
-}
+      try {
+        let roomId = generateRoomCode();
+        let attempts = 0;
 
-function leave(){
-if(roomRef){
-roomRef.off("value",roomListener);
-roomRef.child("chat").off("child_added",chatListener);
-}
-roomRef=null;
-roomId=null;
-roomData=null;
-$("game").classList.add("hidden");
-$("chatCard").classList.add("hidden");
-$("lobby").classList.remove("hidden");
-}
+        while (attempts < 6) {
+          const checkSnap = await get(ref(db, `rooms/${roomId}`));
+          if (!checkSnap.exists()) break;
+          roomId = generateRoomCode();
+          attempts++;
+        }
 
-cells.forEach((c,i)=>c.addEventListener("click",()=>move(i)));
-$("createBtn").onclick=createRoom;
-$("showJoin").onclick=()=>$("joinArea").classList.toggle("hidden");
-$("joinBtn").onclick=joinRoom;
-$("leaveBtn").onclick=leave;
-$("newGameBtn").onclick=nextRound;
-$("rematchBtn").onclick=requestRematch;
-$("copyBtn").onclick=()=>navigator.clipboard.writeText(roomId);
-$("chatForm").onsubmit=e=>{
-e.preventDefault();
-let input=$("chatInput");
-sendChat(input.value).then(()=>input.value="");
-};
-document.querySelectorAll(".emoji").forEach(b=>
-b.onclick=()=>sendChat(b.textContent)
-);
-</script>
+        const initialRoom = {
+          p1: { uid: currentUser.uid, name },
+          board: { "0": "", "1": "", "2": "", "3": "", "4": "", "5": "", "6": "", "7": "", "8": "" },
+          turn: "X",
+          status: "waiting",
+          winner: "",
+          winLine: "",
+          scores: { X: 0, O: 0, draws: 0 },
+          createdAt: serverTimestamp()
+        };
+
+        await set(ref(db, `rooms/${roomId}`), initialRoom);
+        myUsername = name;
+        enterRoom(roomId);
+      } catch (err) {
+        console.error(err);
+        showError("Could not create room: " + err.message);
+      } finally {
+        createBtn.disabled = false;
+        createBtn.textContent = "Create Private Room";
+      }
+    });
+
+    joinBtn.addEventListener("click", async () => {
+      clearError();
+      if (!currentUser) return showError("Still connecting to server. Please wait 2 seconds.");
+      const name = getCleanUsername();
+      if (!name) return;
+
+      const code = codeInput.value.trim();
+      if (!/^[0-9]{6}$/.test(code)) {
+        showError("Please enter a valid 6-digit room code.");
+        codeInput.focus();
+        return;
+      }
+
+      joinBtn.disabled = true;
+      joinBtn.textContent = "Joining...";
+
+      try {
+        const targetRef = ref(db, `rooms/${code}`);
+        const snap = await get(targetRef);
+
+        if (!snap.exists()) {
+          showError("Room not found. Check the 6-digit code and try again.");
+          return;
+        }
+
+        const data = snap.val();
+
+        if (data.p1 && data.p1.uid === currentUser.uid) {
+          myUsername = data.p1.name;
+          enterRoom(code);
+          return;
+        }
+        if (data.p2 && data.p2.uid === currentUser.uid) {
+          myUsername = data.p2.name;
+          enterRoom(code);
+          return;
+        }
+
+        if (data.p2) {
+          showError("This room is full (2 players maximum).");
+          return;
+        }
+
+        await update(targetRef, {
+          p2: { uid: currentUser.uid, name },
+          status: "playing"
+        });
+
+        myUsername = name;
+        enterRoom(code);
+      } catch (err) {
+        console.error(err);
+        showError("Could not join room (it may already be full).");
+      } finally {
+        joinBtn.disabled = false;
+        joinBtn.textContent = "Join";
+      }
+    });
+
+    function enterRoom(roomId) {
+      currentRoomId = roomId;
+      displayRoomCode.textContent = roomId;
+      lobbyScreen.classList.add("hidden");
+      gameScreen.classList.remove("hidden");
+
+      roomRef = ref(db, `rooms/${roomId}`);
+      onValue(roomRef, (snapshot) => {
+        if (!snapshot.exists()) return;
+        currentRoomData = snapshot.val();
+        renderRoom(currentRoomData);
+      });
+
+      chatQueryRef = query(ref(db, `rooms/${roomId}/chat`), limitToLast(50));
+      onValue(chatQueryRef, (snapshot) => {
+        renderChat(snapshot.val());
+      });
+    }
+
+    leaveBtn.addEventListener("click", () => {
+      if (roomRef) off(roomRef);
+      if (chatQueryRef) off(chatQueryRef);
+      roomRef = null;
+      chatQueryRef = null;
+      currentRoomId = null;
+      currentRoomData = null;
+      mySymbol = null;
+      gameScreen.classList.add("hidden");
+      lobbyScreen.classList.remove("hidden");
+      clearError();
+    });
+
+    copyCodeBtn.addEventListener("click", async () => {
+      if (!currentRoomId) return;
+      try {
+        await navigator.clipboard.writeText(currentRoomId);
+      } catch {
+        const temp = document.createElement("input");
+        temp.value = currentRoomId;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+      }
+      copyCodeBtn.textContent = "Copied!";
+      setTimeout(() => {
+        copyCodeBtn.textContent = "Copy";
+      }, 1500);
+    });
+
+    function renderRoom(data) {
+      if (!currentUser) return;
+
+      if (data.p1 && data.p1.uid === currentUser.uid) {
+        mySymbol = "X";
+      } else if (data.p2 && data.p2.uid === currentUser.uid) {
+        mySymbol = "O";
+      } else {
+        mySymbol = null;
+      }
+
+      p1NameEl.textContent = data.p1 ? data.p1.name : "---";
+      p2NameEl.textContent = data.p2 ? data.p2.name : "Waiting...";
+
+      const scores = data.scores || { X: 0, O: 0, draws: 0 };
+      p1ScoreEl.textContent = scores.X || 0;
+      p2ScoreEl.textContent = scores.O || 0;
+      drawScoreEl.textContent = scores.draws || 0;
+
+      p1Box.classList.toggle("active-x", data.status === "playing" && data.turn === "X");
+      p2Box.classList.toggle("active-o", data.status === "playing" && data.turn === "O");
+
+      statusBanner.className = "status-banner";
+      if (!data.p2 || data.status === "waiting") {
+        statusBanner.textContent = `Share code ${currentRoomId} with your friend...`;
+      } else if (data.status === "playing") {
+        if (data.turn === mySymbol) {
+          statusBanner.textContent = `Your Turn (${mySymbol})`;
+        } else {
+          const oppName = mySymbol === "X" ? data.p2.name : data.p1.name;
+          statusBanner.textContent = `${oppName}'s Turn (${data.turn})`;
+        }
+      } else if (data.status === "finished") {
+        if (data.winner === "draw") {
+          statusBanner.classList.add("draw");
+          statusBanner.textContent = "It's a Draw!";
+        } else if (data.winner === mySymbol) {
+          statusBanner.classList.add("win");
+          statusBanner.textContent = "You Win! 🎉";
+        } else {
+          const winName = data.winner === "X" ? data.p1.name : data.p2.name;
+          statusBanner.textContent = `${winName} (${data.winner}) Wins!`;
+        }
+      }
+
+      const boardObj = data.board || {};
+      const winIndices = data.winLine ? data.winLine.split(",").map(Number) : [];
+      const canPlay = data.status === "playing" && Boolean(data.p2) && data.turn === mySymbol;
+
+      cells.forEach((cell, idx) => {
+        const val = boardObj[idx] || "";
+        cell.textContent = val;
+        cell.className = "cell";
+        if (val === "X") cell.classList.add("x");
+        if (val === "O") cell.classList.add("o");
+        if (winIndices.includes(idx)) cell.classList.add("win-cell");
+        if (!canPlay || val !== "") cell.classList.add("disabled");
+      });
+    }
+
+    cells.forEach((cell) => {
+      cell.addEventListener("click", async () => {
+        if (!currentRoomData || !currentRoomId || !mySymbol) return;
+        if (currentRoomData.status !== "playing") return;
+        if (!currentRoomData.p2) return;
+        if (currentRoomData.turn !== mySymbol) return;
+
+        const idx = Number(cell.dataset.index);
+        const boardObj = currentRoomData.board || {};
+        if (boardObj[idx]) return;
+
+        const nextBoard = [];
+        for (let i = 0; i < 9; i++) {
+          nextBoard[i] = i === idx ? mySymbol : (boardObj[i] || "");
+        }
+
+        let winningPattern = null;
+        for (const pattern of WIN_PATTERNS) {
+          const [a, b, c] = pattern;
+          if (nextBoard[a] && nextBoard[a] === nextBoard[b] && nextBoard[a] === nextBoard[c]) {
+            winningPattern = pattern;
+            break;
+          }
+        }
+
+        const isDraw = !winningPattern && nextBoard.every((v) => v !== "");
+        const scores = currentRoomData.scores || { X: 0, O: 0, draws: 0 };
+        const updates = {};
+        updates[`board/${idx}`] = mySymbol;
+
+        if (winningPattern) {
+          updates["status"] = "finished";
+          updates["winner"] = mySymbol;
+          updates["winLine"] = winningPattern.join(",");
+          updates[`scores/${mySymbol}`] = (scores[mySymbol] || 0) + 1;
+        } else if (isDraw) {
+          updates["status"] = "finished";
+          updates["winner"] = "draw";
+          updates["winLine"] = "";
+          updates["scores/draws"] = (scores.draws || 0) + 1;
+        } else {
+          updates["turn"] = mySymbol === "X" ? "O" : "X";
+        }
+
+        try {
+          await update(ref(db, `rooms/${currentRoomId}`), updates);
+        } catch (err) {
+          console.error("Move rejected:", err);
+        }
+      });
+    });
+
+    async function startFreshRound() {
+      if (!currentRoomData || !currentRoomId || !mySymbol) return;
+      const nextStarter = currentRoomData.turn === "X" ? "O" : "X";
+      const updates = {
+        "board/0": "",
+        "board/1": "",
+        "board/2": "",
+        "board/3": "",
+        "board/4": "",
+        "board/5": "",
+        "board/6": "",
+        "board/7": "",
+        "board/8": "",
+        status: currentRoomData.p2 ? "playing" : "waiting",
+        winner: "",
+        winLine: "",
+        turn: nextStarter
+      };
+      try {
+        await update(ref(db, `rooms/${currentRoomId}`), updates);
+      } catch (err) {
+        console.error("Reset error:", err);
+      }
+    }
+
+    newRoundBtn.addEventListener("click", startFreshRound);
+    rematchBtn.addEventListener("click", startFreshRound);
+
+    async function sendChatMessage(rawText) {
+      if (!currentRoomId || !currentUser || !mySymbol) return;
+      const text = rawText.trim().slice(0, 100);
+      if (!text) return;
+
+      const now = Date.now();
+      if (now - lastChatTime < 1200) return;
+      lastChatTime = now;
+
+      try {
+        const chatListRef = ref(db, `rooms/${currentRoomId}/chat`);
+        await push(chatListRef, {
+          uid: currentUser.uid,
+          name: myUsername || "Player",
+          text,
+          ts: serverTimestamp()
+        });
+      } catch (err) {
+        console.error("Chat error:", err);
+      }
+    }
+
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = chatInput.value;
+      chatInput.value = "";
+      await sendChatMessage(text);
+    });
+
+    emojiButtons.forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        await sendChatMessage(btn.dataset.emoji);
+      });
+    });
+
+    function renderChat(chatObj) {
+      chatMessages.innerHTML = "";
+      if (!chatObj) {
+        const empty = document.createElement("div");
+        empty.className = "chat-empty";
+        empty.textContent = "Say hi or tap an emoji below!";
+        chatMessages.appendChild(empty);
+        return;
+      }
+
+      const entries = Object.values(chatObj);
+      entries.forEach((item) => {
+        const bubble = document.createElement("div");
+        const isMine = currentUser && item.uid === currentUser.uid;
+        bubble.className = `msg ${isMine ? "mine" : "theirs"}`;
+
+        const sender = document.createElement("div");
+        sender.className = "msg-sender";
+        sender.textContent = isMine ? `${item.name} (You)` : item.name;
+
+        const body = document.createElement("div");
+        body.textContent = item.text;
+
+        bubble.appendChild(sender);
+        bubble.appendChild(body);
+        chatMessages.appendChild(bubble);
+      });
+
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  </script>
 </body>
 </html>
