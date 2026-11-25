@@ -49,26 +49,50 @@
     .header {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 8px 0 4px;
+      justify-content: space-between;
+      padding: 6px 4px 2px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .site-logo {
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: 10px;
       object-fit: cover;
       border: 1px solid var(--border);
     }
 
     .header h1 {
-      font-size: 1.45rem;
+      font-size: 1.4rem;
       font-weight: 800;
       background: linear-gradient(90deg, #60a5fa, #c084fc);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       letter-spacing: 0.3px;
+    }
+
+    .sound-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      font-size: 1.15rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s ease;
+    }
+
+    .sound-btn:active {
+      transform: scale(0.94);
     }
 
     .card {
@@ -118,7 +142,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .btn:active {
@@ -144,8 +168,8 @@
 
     .btn-small {
       width: auto;
-      padding: 8px 12px;
-      font-size: 0.85rem;
+      padding: 7px 11px;
+      font-size: 0.82rem;
       border-radius: 10px;
     }
 
@@ -196,6 +220,12 @@
       display: none;
     }
 
+    .alert.info {
+      background: rgba(59, 130, 246, 0.16);
+      border-color: rgba(59, 130, 246, 0.45);
+      color: #dbeafe;
+    }
+
     .alert.show {
       display: block;
     }
@@ -214,29 +244,35 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
     }
 
     .code-badge {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: var(--bg-surface);
       border: 1px solid var(--border);
-      padding: 8px 12px;
+      padding: 6px 10px;
       border-radius: 12px;
     }
 
     .code-badge span {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
     }
 
     .code-badge strong {
-      font-size: 1.15rem;
-      letter-spacing: 2px;
+      font-size: 1.05rem;
+      letter-spacing: 1.5px;
       color: #93c5fd;
+    }
+
+    .room-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .scoreboard {
@@ -493,8 +529,11 @@
 <body>
   <div class="app-container">
     <header class="header">
-      <img src="logo.png" alt="Logo" class="site-logo" onerror="this.style.display='none'" />
-      <h1>Tic Tac Toe Live</h1>
+      <div class="header-brand">
+        <img src="logo.png" alt="Logo" class="site-logo" onerror="this.style.display='none'" />
+        <h1>Tic Tac Toe Live</h1>
+      </div>
+      <button id="soundToggleBtn" class="sound-btn" type="button" aria-label="Toggle Sound">🔊</button>
     </header>
 
     <div id="errorBox" class="alert"></div>
@@ -526,7 +565,10 @@
             <strong id="displayRoomCode">------</strong>
             <button id="copyCodeBtn" class="btn btn-secondary btn-small" type="button">Copy</button>
           </div>
-          <button id="leaveBtn" class="btn btn-secondary btn-small" type="button">Leave</button>
+          <div class="room-actions">
+            <button id="inviteBtn" class="btn btn-primary btn-small" type="button">Invite</button>
+            <button id="leaveBtn" class="btn btn-secondary btn-small" type="button">Leave</button>
+          </div>
         </div>
 
         <div class="scoreboard">
@@ -629,6 +671,79 @@
       [0, 4, 8], [2, 4, 6]
     ];
 
+    // Sound Engine (Web Audio API - works offline & on iPhone without MP3 files)
+    let soundEnabled = localStorage.getItem("ttt_sound") !== "off";
+    let audioCtx = null;
+    const soundToggleBtn = document.getElementById("soundToggleBtn");
+    soundToggleBtn.textContent = soundEnabled ? "🔊" : "🔇";
+
+    function unlockAudio() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume().catch(() => {});
+      }
+    }
+
+    document.addEventListener("pointerdown", unlockAudio, { passive: true });
+    document.addEventListener("touchstart", unlockAudio, { passive: true });
+
+    soundToggleBtn.addEventListener("click", () => {
+      unlockAudio();
+      soundEnabled = !soundEnabled;
+      localStorage.setItem("ttt_sound", soundEnabled ? "on" : "off");
+      soundToggleBtn.textContent = soundEnabled ? "🔊" : "🔇";
+      if (soundEnabled) playTone(520, 0.08, "sine", 0.12);
+    });
+
+    function playTone(freq, duration, type = "sine", volume = 0.14, delay = 0) {
+      if (!soundEnabled) return;
+      unlockAudio();
+      if (!audioCtx) return;
+
+      const start = audioCtx.currentTime + delay;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, start);
+
+      gain.gain.setValueAtTime(0.001, start);
+      gain.gain.exponentialRampToValueAtTime(volume, start + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(start);
+      osc.stop(start + duration + 0.02);
+    }
+
+    function playSound(event) {
+      if (!soundEnabled) return;
+      if (event === "moveX") {
+        playTone(540, 0.09, "triangle", 0.16);
+      } else if (event === "moveO") {
+        playTone(410, 0.09, "triangle", 0.16);
+      } else if (event === "win") {
+        playTone(523.25, 0.12, "sine", 0.18, 0);
+        playTone(659.25, 0.12, "sine", 0.18, 0.1);
+        playTone(783.99, 0.24, "sine", 0.2, 0.2);
+      } else if (event === "lose") {
+        playTone(360, 0.14, "sine", 0.14, 0);
+        playTone(280, 0.22, "sine", 0.14, 0.13);
+      } else if (event === "draw") {
+        playTone(440, 0.1, "sine", 0.13, 0);
+        playTone(440, 0.12, "sine", 0.13, 0.12);
+      } else if (event === "join") {
+        playTone(480, 0.09, "sine", 0.14, 0);
+        playTone(640, 0.14, "sine", 0.15, 0.09);
+      } else if (event === "chat") {
+        playTone(720, 0.06, "sine", 0.09, 0);
+      }
+    }
+
+    // DOM Elements
     const errorBox = document.getElementById("errorBox");
     const lobbyScreen = document.getElementById("lobbyScreen");
     const gameScreen = document.getElementById("gameScreen");
@@ -638,6 +753,7 @@
     const joinBtn = document.getElementById("joinBtn");
     const displayRoomCode = document.getElementById("displayRoomCode");
     const copyCodeBtn = document.getElementById("copyCodeBtn");
+    const inviteBtn = document.getElementById("inviteBtn");
     const leaveBtn = document.getElementById("leaveBtn");
     const p1Box = document.getElementById("p1Box");
     const p2Box = document.getElementById("p2Box");
@@ -665,14 +781,29 @@
     let chatQueryRef = null;
     let lastChatTime = 0;
 
-    function showError(msg) {
+    // Track previous room/chat states so sounds only play once per new event
+    let prevBoardSnapshot = null;
+    let prevStatusSnapshot = null;
+    let prevHasP2 = false;
+    let prevChatKeys = new Set();
+    let isFirstChatLoad = true;
+
+    function showBanner(msg, isInfo = false) {
       errorBox.textContent = msg;
-      errorBox.classList.add("show");
+      errorBox.className = isInfo ? "alert info show" : "alert show";
     }
 
     function clearError() {
       errorBox.textContent = "";
-      errorBox.classList.remove("show");
+      errorBox.className = "alert";
+    }
+
+    // Check URL for ?room=123456 invite parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const invitedRoom = urlParams.get("room");
+    if (invitedRoom && /^[0-9]{6}$/.test(invitedRoom)) {
+      codeInput.value = invitedRoom;
+      showBanner(`Invited to Room ${invitedRoom}! Enter your name and tap Join.`, true);
     }
 
     try {
@@ -692,13 +823,13 @@
       signInAnonymously(auth).catch((err) => {
         console.error(err);
         if (err.code === "auth/unauthorized-domain") {
-          showError("Domain not authorized yet: Add your website domain in Firebase Authentication > Settings > Authorized domains.");
+          showBanner("Domain not authorized yet: Add your domain in Firebase Authentication > Settings > Authorized domains.");
         } else {
-          showError("Connection error: " + err.message);
+          showBanner("Connection error: " + err.message);
         }
       });
     } catch (err) {
-      showError("Firebase config error: " + err.message);
+      showBanner("Firebase config error: " + err.message);
     }
 
     const savedName = localStorage.getItem("ttt_username");
@@ -707,7 +838,7 @@
     function getCleanUsername() {
       const clean = usernameInput.value.trim().slice(0, 20);
       if (!clean) {
-        showError("Please enter a username first.");
+        showBanner("Please enter a username first.");
         usernameInput.focus();
         return null;
       }
@@ -721,7 +852,8 @@
 
     createBtn.addEventListener("click", async () => {
       clearError();
-      if (!currentUser) return showError("Still connecting to server. Please wait 2 seconds.");
+      unlockAudio();
+      if (!currentUser) return showBanner("Still connecting to server. Please wait 2 seconds.");
       const name = getCleanUsername();
       if (!name) return;
 
@@ -752,10 +884,11 @@
 
         await set(ref(db, `rooms/${roomId}`), initialRoom);
         myUsername = name;
+        playSound("join");
         enterRoom(roomId);
       } catch (err) {
         console.error(err);
-        showError("Could not create room: " + err.message);
+        showBanner("Could not create room: " + err.message);
       } finally {
         createBtn.disabled = false;
         createBtn.textContent = "Create Private Room";
@@ -764,13 +897,14 @@
 
     joinBtn.addEventListener("click", async () => {
       clearError();
-      if (!currentUser) return showError("Still connecting to server. Please wait 2 seconds.");
+      unlockAudio();
+      if (!currentUser) return showBanner("Still connecting to server. Please wait 2 seconds.");
       const name = getCleanUsername();
       if (!name) return;
 
       const code = codeInput.value.trim();
       if (!/^[0-9]{6}$/.test(code)) {
-        showError("Please enter a valid 6-digit room code.");
+        showBanner("Please enter a valid 6-digit room code.");
         codeInput.focus();
         return;
       }
@@ -783,7 +917,7 @@
         const snap = await get(targetRef);
 
         if (!snap.exists()) {
-          showError("Room not found. Check the 6-digit code and try again.");
+          showBanner("Room not found. Check the 6-digit code and try again.");
           return;
         }
 
@@ -801,7 +935,7 @@
         }
 
         if (data.p2) {
-          showError("This room is full (2 players maximum).");
+          showBanner("This room is full (2 players maximum).");
           return;
         }
 
@@ -811,10 +945,11 @@
         });
 
         myUsername = name;
+        playSound("join");
         enterRoom(code);
       } catch (err) {
         console.error(err);
-        showError("Could not join room (it may already be full).");
+        showBanner("Could not join room (it may already be full).");
       } finally {
         joinBtn.disabled = false;
         joinBtn.textContent = "Join";
@@ -826,6 +961,18 @@
       displayRoomCode.textContent = roomId;
       lobbyScreen.classList.add("hidden");
       gameScreen.classList.remove("hidden");
+      clearError();
+
+      // Clean ?room= from URL bar once inside room
+      if (window.location.search) {
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+
+      prevBoardSnapshot = null;
+      prevStatusSnapshot = null;
+      prevHasP2 = false;
+      prevChatKeys = new Set();
+      isFirstChatLoad = true;
 
       roomRef = ref(db, `rooms/${roomId}`);
       onValue(roomRef, (snapshot) => {
@@ -853,22 +1000,50 @@
       clearError();
     });
 
-    copyCodeBtn.addEventListener("click", async () => {
-      if (!currentRoomId) return;
+    async function copyTextFallback(text) {
       try {
-        await navigator.clipboard.writeText(currentRoomId);
+        await navigator.clipboard.writeText(text);
       } catch {
         const temp = document.createElement("input");
-        temp.value = currentRoomId;
+        temp.value = text;
         document.body.appendChild(temp);
         temp.select();
         document.execCommand("copy");
         document.body.removeChild(temp);
       }
+    }
+
+    copyCodeBtn.addEventListener("click", async () => {
+      if (!currentRoomId) return;
+      await copyTextFallback(currentRoomId);
       copyCodeBtn.textContent = "Copied!";
       setTimeout(() => {
         copyCodeBtn.textContent = "Copy";
       }, 1500);
+    });
+
+    inviteBtn.addEventListener("click", async () => {
+      if (!currentRoomId) return;
+      const inviteUrl = `${window.location.origin}${window.location.pathname}?room=${currentRoomId}`;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: "Tic Tac Toe Live",
+            text: `Play Tic Tac Toe with me! Room code: ${currentRoomId}`,
+            url: inviteUrl
+          });
+          return;
+        } catch (err) {
+          if (err.name === "AbortError") return;
+        }
+      }
+
+      await copyTextFallback(inviteUrl);
+      inviteBtn.textContent = "Link Copied!";
+      setTimeout(() => {
+        inviteBtn.textContent = "Invite";
+      }, 1800);
     });
 
     function renderRoom(data) {
@@ -881,6 +1056,41 @@
       } else {
         mySymbol = null;
       }
+
+      const boardObj = data.board || {};
+      const hasP2 = Boolean(data.p2);
+
+      // Play sound when Player 2 joins
+      if (prevBoardSnapshot !== null && !prevHasP2 && hasP2) {
+        playSound("join");
+      }
+
+      // Play sound when a new move appears on the board
+      if (prevBoardSnapshot !== null) {
+        for (let i = 0; i < 9; i++) {
+          const oldVal = prevBoardSnapshot[i] || "";
+          const newVal = boardObj[i] || "";
+          if (oldVal === "" && newVal !== "") {
+            playSound(newVal === "X" ? "moveX" : "moveO");
+            break;
+          }
+        }
+      }
+
+      // Play sound when round finishes
+      if (prevStatusSnapshot !== null && prevStatusSnapshot !== "finished" && data.status === "finished") {
+        if (data.winner === "draw") {
+          playSound("draw");
+        } else if (data.winner === mySymbol) {
+          playSound("win");
+        } else {
+          playSound("lose");
+        }
+      }
+
+      prevBoardSnapshot = { ...boardObj };
+      prevStatusSnapshot = data.status;
+      prevHasP2 = hasP2;
 
       p1NameEl.textContent = data.p1 ? data.p1.name : "---";
       p2NameEl.textContent = data.p2 ? data.p2.name : "Waiting...";
@@ -895,7 +1105,7 @@
 
       statusBanner.className = "status-banner";
       if (!data.p2 || data.status === "waiting") {
-        statusBanner.textContent = `Share code ${currentRoomId} with your friend...`;
+        statusBanner.textContent = `Tap Invite or share code ${currentRoomId}...`;
       } else if (data.status === "playing") {
         if (data.turn === mySymbol) {
           statusBanner.textContent = `Your Turn (${mySymbol})`;
@@ -916,7 +1126,6 @@
         }
       }
 
-      const boardObj = data.board || {};
       const winIndices = data.winLine ? data.winLine.split(",").map(Number) : [];
       const canPlay = data.status === "playing" && Boolean(data.p2) && data.turn === mySymbol;
 
@@ -933,6 +1142,7 @@
 
     cells.forEach((cell) => {
       cell.addEventListener("click", async () => {
+        unlockAudio();
         if (!currentRoomData || !currentRoomId || !mySymbol) return;
         if (currentRoomData.status !== "playing") return;
         if (!currentRoomData.p2) return;
@@ -984,6 +1194,7 @@
     });
 
     async function startFreshRound() {
+      unlockAudio();
       if (!currentRoomData || !currentRoomId || !mySymbol) return;
       const nextStarter = currentRoomData.turn === "X" ? "O" : "X";
       const updates = {
@@ -1012,6 +1223,7 @@
     rematchBtn.addEventListener("click", startFreshRound);
 
     async function sendChatMessage(rawText) {
+      unlockAudio();
       if (!currentRoomId || !currentUser || !mySymbol) return;
       const text = rawText.trim().slice(0, 100);
       if (!text) return;
@@ -1053,13 +1265,23 @@
         empty.className = "chat-empty";
         empty.textContent = "Say hi or tap an emoji below!";
         chatMessages.appendChild(empty);
+        isFirstChatLoad = false;
         return;
       }
 
-      const entries = Object.values(chatObj);
-      entries.forEach((item) => {
-        const bubble = document.createElement("div");
+      const keys = Object.keys(chatObj);
+      let hasNewIncomingMsg = false;
+
+      keys.forEach((key) => {
+        const item = chatObj[key];
         const isMine = currentUser && item.uid === currentUser.uid;
+
+        if (!isFirstChatLoad && !prevChatKeys.has(key) && !isMine) {
+          hasNewIncomingMsg = true;
+        }
+        prevChatKeys.add(key);
+
+        const bubble = document.createElement("div");
         bubble.className = `msg ${isMine ? "mine" : "theirs"}`;
 
         const sender = document.createElement("div");
@@ -1074,6 +1296,10 @@
         chatMessages.appendChild(bubble);
       });
 
+      if (hasNewIncomingMsg) {
+        playSound("chat");
+      }
+      isFirstChatLoad = false;
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
   </script>
