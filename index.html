@@ -671,7 +671,6 @@
       [0, 4, 8], [2, 4, 6]
     ];
 
-    // Sound Engine (Web Audio API - works offline & on iPhone without MP3 files)
     let soundEnabled = localStorage.getItem("ttt_sound") !== "off";
     let audioCtx = null;
     const soundToggleBtn = document.getElementById("soundToggleBtn");
@@ -743,7 +742,6 @@
       }
     }
 
-    // DOM Elements
     const errorBox = document.getElementById("errorBox");
     const lobbyScreen = document.getElementById("lobbyScreen");
     const gameScreen = document.getElementById("gameScreen");
@@ -781,7 +779,6 @@
     let chatQueryRef = null;
     let lastChatTime = 0;
 
-    // Track previous room/chat states so sounds only play once per new event
     let prevBoardSnapshot = null;
     let prevStatusSnapshot = null;
     let prevHasP2 = false;
@@ -798,7 +795,6 @@
       errorBox.className = "alert";
     }
 
-    // Check URL for ?room=123456 invite parameter
     const urlParams = new URLSearchParams(window.location.search);
     const invitedRoom = urlParams.get("room");
     if (invitedRoom && /^[0-9]{6}$/.test(invitedRoom)) {
@@ -963,7 +959,6 @@
       gameScreen.classList.remove("hidden");
       clearError();
 
-      // Clean ?room= from URL bar once inside room
       if (window.location.search) {
         window.history.replaceState({}, "", window.location.pathname);
       }
@@ -1060,12 +1055,10 @@
       const boardObj = data.board || {};
       const hasP2 = Boolean(data.p2);
 
-      // Play sound when Player 2 joins
       if (prevBoardSnapshot !== null && !prevHasP2 && hasP2) {
         playSound("join");
       }
 
-      // Play sound when a new move appears on the board
       if (prevBoardSnapshot !== null) {
         for (let i = 0; i < 9; i++) {
           const oldVal = prevBoardSnapshot[i] || "";
@@ -1077,7 +1070,6 @@
         }
       }
 
-      // Play sound when round finishes
       if (prevStatusSnapshot !== null && prevStatusSnapshot !== "finished" && data.status === "finished") {
         if (data.winner === "draw") {
           playSound("draw");
